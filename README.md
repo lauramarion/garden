@@ -1,2 +1,2 @@
-# garden
+# 🌼🌻🌷🌹🌳🌿🍀🌞🍁🍂🌦❄
 garden_project
