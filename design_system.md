@@ -283,15 +283,15 @@ bottom: 0;
 
 ## 10 — Icons
 
-All icons are bespoke 16×16 pixel SVGs from the `garden_icons/` set.
+All icons are bespoke 24×24 pixel SVGs from the `garden_icons/` set.
 
 **No emoji anywhere in the UI. Ever.**
 
 ### Canonical display sizes
 | Size | Usage |
 |---|---|
-| 16px | Inline text, tight UI |
-| 24px | Nav tab icons |
+| 16px | Inline text, tight UI (scaled down from 24) |
+| 24px | Nav tab icons (native grid size) |
 | 32px | Card sprite slot |
 | 48px | Feature / hero |
 
@@ -304,6 +304,9 @@ When scaling up, use exact 2× or 3× multiples only (32px, 48px from a 16px sou
 
 ### Undefined icon
 `undefined.svg` (hot pink border + X pattern) is the mandatory placeholder whenever a permanent icon has not yet been drawn. Never use emoji as a temporary substitute.
+
+### Tool
+Icons are drawn in **PixelForge** (custom tool — lauramarion.github.io/pixelforge) with the Garden Project palette preset loaded.
 
 ### Current icon set
 `plant` · `sun` · `water` · `alert` · `zone` · `journal` · `season` · `thriving` · `lost` · `seedling` · `bloom` · `dormant` · `task` · `map` · `add` · `undefined`
@@ -342,7 +345,7 @@ No tablet-specific breakpoint.
 ```css
 image-rendering: pixelated;
 ```
-On all sprites and icons, always. Canonical sizes: 16, 24, 32, 48px.
+On all sprites and icons, always. Canonical sizes: 24px native · scale to 48px (2×) for feature contexts · scale down to 16px for tight inline use.
 
 ---
 
