@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, Boolean
+from sqlalchemy import Column, Integer, Text, Boolean, Numeric
 from .base import Base
 
 class Zone(Base):
@@ -11,4 +11,6 @@ class Zone(Base):
     moisture = Column(Text)
     covered = Column(Boolean, default=False)
     wind_exposure = Column(Text)
+    has_soil = Column(Boolean, default=False)
+    soil_ph = Column(Numeric(4, 2))
     notes = Column(Text)
