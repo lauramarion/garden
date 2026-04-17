@@ -4,6 +4,31 @@ const ctx = canvas.getContext('2d');
 const TW = 52, TH = 26;
 const ORIGIN_X = 120, ORIGIN_Y = 200;
 
+// Bounding box of the full grid in base (unscaled) coordinates
+// x: ORIGIN_X … ORIGIN_X + (maxCol+maxRow)*(TW/2) + TW
+// y: ORIGIN_Y - maxRow*(TH/2) - TH/2 … ORIGIN_Y + maxCol*(TH/2) + TH/2
+const MAP_X1 = ORIGIN_X;
+const MAP_X2 = ORIGIN_X + (17 + 9) * (TW / 2) + TW;   // 848
+const MAP_Y1 = ORIGIN_Y - 9 * (TH / 2) - TH / 2;       // 70
+const MAP_Y2 = ORIGIN_Y + 17 * (TH / 2) + TH / 2;      // 434
+
+// Viewport transform – updated by fitCanvas(), used by render() and hit detection
+let _dx = 0, _dy = 0, _rs = 1;
+
+function fitCanvas() {
+  const panel = canvas.parentElement;
+  const pw = panel.clientWidth;
+  const ph = panel.clientHeight;
+  canvas.width  = pw;
+  canvas.height = ph;
+  const PAD = 24;
+  const cw = MAP_X2 - MAP_X1;
+  const ch = MAP_Y2 - MAP_Y1;
+  _rs = Math.min((pw - PAD * 2) / cw, (ph - PAD * 2) / ch);
+  _dx = (pw - cw * _rs) / 2 - MAP_X1 * _rs;
+  _dy = (ph - ch * _rs) / 2 - MAP_Y1 * _rs;
+}
+
 // ── Coordinate conversion ──────────────────────────────────
 function toScreen(c, r) {
   return {
@@ -17,23 +42,23 @@ function toScreen(c, r) {
 // drawing uses JS values directly
 // CSS does not apply to canvas elements.
 const ZONE_COLORS = {
-  back:               { fill: '#1a2e10', stroke: '#243a16' },
-  left_border_front:  { fill: '#1e3a12', stroke: '#2a5018' },
-  left_border_back:   { fill: '#1e3a12', stroke: '#2a5018' },
-  left_path:          { fill: '#2a2218', stroke: '#3a3224' },
-  lawn:               { fill: '#2a5616', stroke: '#367020' },
-  right_border_front: { fill: '#1a3610', stroke: '#264a18' },
-  right_border_back:  { fill: '#162e0e', stroke: '#1e4014' },
-  entry:              { fill: '#282018', stroke: '#383024' },
-  retaining_wall:     { fill: '#302820', stroke: '#403828' },
-  patio_uncovered:    { fill: '#201c14', stroke: '#302c20' },
-  patio_covered:      { fill: '#1a1810', stroke: '#2a2818' },
-  patio_shelf_1:      { fill: '#181610', stroke: '#28260e' },
-  patio_shelf_2:      { fill: '#181610', stroke: '#28260e' },
-  pond:               { fill: '#0c2838', stroke: '#164858' },
-  rain_barrel:        { fill: '#1e2e10', stroke: '#2a4018' },
-  compost:            { fill: '#1a1e0e', stroke: '#242810' },
-  default:            { fill: '#1a2a1a', stroke: '#2a3a2a' },
+  back:               { fill: '#a8d5a2', stroke: '#7db87a' },
+  left_border_front:  { fill: '#4caf50', stroke: '#388e3c' },
+  left_border_back:   { fill: '#4caf50', stroke: '#388e3c' },
+  left_path:          { fill: '#c8c8c0', stroke: '#a8a89e' },
+  lawn:               { fill: '#7ec850', stroke: '#5aaa2e' },
+  right_border_front: { fill: '#66bb6a', stroke: '#43a047' },
+  right_border_back:  { fill: '#81c784', stroke: '#558b2f' },
+  entry:              { fill: '#b8b8b0', stroke: '#989890' },
+  retaining_wall:     { fill: '#a8a8a0', stroke: '#888880' },
+  patio_uncovered:    { fill: '#dcdcd8', stroke: '#bcbcb8' },
+  patio_covered:      { fill: '#d0d0cc', stroke: '#b0b0ac' },
+  patio_shelf_1:      { fill: '#e8e8e4', stroke: '#c8c8c4' },
+  patio_shelf_2:      { fill: '#e8e8e4', stroke: '#c8c8c4' },
+  pond:               { fill: '#4fc3f7', stroke: '#0288d1' },
+  rain_barrel:        { fill: '#78909c', stroke: '#546e7a' },
+  compost:            { fill: '#8d6e63', stroke: '#6d4c41' },
+  default:            { fill: '#a5d6a7', stroke: '#81c784' },
 };
 
 function zoneCodeAt(c, r) {
@@ -79,12 +104,12 @@ function drawPond() {
     ctx.lineTo(x + TW / 2, y + TH / 2);
     ctx.lineTo(x,          y);
     ctx.closePath();
-    ctx.fillStyle = '#0c2838';
+    ctx.fillStyle = '#4fc3f7';
     ctx.fill();
-    ctx.strokeStyle = '#1a4858';
+    ctx.strokeStyle = '#0288d1';
     ctx.lineWidth = 0.5;
     ctx.stroke();
-    ctx.fillStyle = '#1e6a2a';
+    ctx.fillStyle = '#66bb6a';
     for (let i = 0; i < 4; i++) {
       ctx.beginPath();
       ctx.arc(x + TW / 2 - 6 + i * 4, y + i % 2 * 3, 2, 0, Math.PI * 2);
@@ -96,7 +121,7 @@ function drawPond() {
 function drawWall() {
   const top = toScreen(12, -0.5);
   const bot = toScreen(12, 9);
-  ctx.strokeStyle = '#6a5a40';
+  ctx.strokeStyle = '#888880';
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(top.x + TW / 2, top.y);
@@ -158,6 +183,9 @@ function drawPlant(plant, highlight) {
 
 function render(hoveredPlant) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(_dx, _dy);
+  ctx.scale(_rs, _rs);
   for (let c = 0; c <= 17; c++) {
     for (let r = 0; r <= 9; r++) {
       const zone = zoneCodeAt(c, r);
@@ -169,6 +197,7 @@ function render(hoveredPlant) {
   [...plants]
     .sort((a, b) => (a.grid_col + a.grid_row) - (b.grid_col + b.grid_row))
     .forEach(p => drawPlant(p, hoveredPlant && hoveredPlant.id === p.id));
+  ctx.restore();
 }
 
 // ── Hit detection ──────────────────────────────────────────
@@ -210,10 +239,18 @@ function hideTooltip() {
 let onPlantClick = null;
 let hoveredPlant = null;
 
-canvas.addEventListener('mousemove', e => {
+function toLogical(clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
-  const sx = canvas.width / rect.width;
-  const p = plantAtMouse((e.clientX - rect.left) * sx, (e.clientY - rect.top) * sx);
+  const css = canvas.width / rect.width;
+  return {
+    x: ((clientX - rect.left) * css - _dx) / _rs,
+    y: ((clientY - rect.top)  * css - _dy) / _rs,
+  };
+}
+
+canvas.addEventListener('mousemove', e => {
+  const { x, y } = toLogical(e.clientX, e.clientY);
+  const p = plantAtMouse(x, y);
   hoveredPlant = p;
   canvas.style.cursor = p ? 'pointer' : 'default';
   render(p);
@@ -222,9 +259,8 @@ canvas.addEventListener('mousemove', e => {
 });
 
 canvas.addEventListener('click', e => {
-  const rect = canvas.getBoundingClientRect();
-  const sx = canvas.width / rect.width;
-  const p = plantAtMouse((e.clientX - rect.left) * sx, (e.clientY - rect.top) * sx);
+  const { x, y } = toLogical(e.clientX, e.clientY);
+  const p = plantAtMouse(x, y);
   if (p && onPlantClick) onPlantClick(p);
 });
 
@@ -241,6 +277,9 @@ let allZones = [];
 let allPlants = [];
 
 async function loadAll() {
+  fitCanvas();
+  window.addEventListener('resize', () => { fitCanvas(); render(hoveredPlant); });
+
   [allPlants, allZones] = await Promise.all([
     fetch('/api/plants/').then(r => r.json()),
     fetch('/api/zones/').then(r => r.json()),
