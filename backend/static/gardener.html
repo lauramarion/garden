@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>garden_project — Gardener</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-title">garden_project</div>
+    <div class="hud">
+      <div class="hud-stat">
+        <div class="label">Vitality</div>
+        <div class="hud-bar-track">
+          <div class="hud-bar-fill" id="hud-vitality-bar" style="width:0%"></div>
+        </div>
+        <div class="value" id="hud-vitality-val">—</div>
+      </div>
+      <div class="hud-stat">
+        <div class="label">Gardener</div>
+        <div class="value" id="hud-level">Lv.1 Seedling</div>
+      </div>
+      <div class="hud-stat">
+        <div class="label">XP</div>
+        <div class="value" id="hud-xp">0</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main layout -->
+  <div class="main-layout">
+
+    <!-- Isometric map -->
+    <div class="map-panel">
+      <canvas id="garden-canvas" width="780" height="480"></canvas>
+    </div>
+
+    <!-- Side panel -->
+    <aside class="side-panel">
+      <div class="side-tabs">
+        <button class="side-tab active" data-tab="plant">Plant</button>
+        <button class="side-tab" data-tab="log">Log</button>
+        <button class="side-tab" data-tab="journal">Journal</button>
+      </div>
+
+      <!-- Plant tab -->
+      <div class="side-content" id="tab-plant">
+        <div class="empty-state" id="plant-empty">
+          Click a plant on the map to inspect it.
+        </div>
+        <div id="plant-detail" style="display:none"></div>
+      </div>
+
+      <!-- Log tab -->
+      <div class="side-content" id="tab-log" style="display:none">
+        <form class="log-form" id="log-form">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="log-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plant (optional)</label>
+            <select class="form-control" id="log-plant">
+              <option value="">— General action —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zone (optional)</label>
+            <select class="form-control" id="log-zone">
+              <option value="">— No specific zone —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-control" id="log-type">
+              <option value="action">Action</option>
+              <option value="observation">Observation</option>
+              <option value="purchase">Purchase</option>
+              <option value="decision">Decision</option>
+              <option value="event">Event</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Details</label>
+            <textarea class="form-control" id="log-details" placeholder="What did you do or observe?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Log entry</button>
+          <div id="log-feedback" style="font-size:11px;color:var(--green);display:none">Entry logged.</div>
+        </form>
+      </div>
+
+      <!-- Journal tab -->
+      <div class="side-content" id="tab-journal" style="display:none">
+        <div id="journal-feed">
+          <div class="empty-state">Loading journal...</div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <script src="/static/js/map.js"></script>
+  <script src="/static/js/gardener.js"></script>
+</body>
+</html>

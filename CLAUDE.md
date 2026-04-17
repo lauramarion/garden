@@ -79,7 +79,7 @@ pip install -r requirements.txt
 Always run Alembic locally — it connects to Postgres via the exposed port 5432.
 ```bash
 cd backend
-source .venv/bin/activate
+source .venv/Scripts/activate  # Windows Git Bash
 alembic upgrade head           # apply all pending migrations
 alembic revision -m "description"  # create a new migration file
 alembic downgrade -1           # roll back one migration
@@ -139,9 +139,29 @@ git commit -m "feat: description"
 git push
 ```
 
+## VPS rules
+The VPS never originates code. It only receives changes from GitHub.
+**On the VPS, never run `git add`, `git commit`, or create/edit files.**
+VPS deployment is always exactly:
+```bash
+git pull
+docker compose up -d --build
+docker compose exec backend alembic upgrade head  # only if migrations changed
+```
+
+## Environment clarity rules
+**Always be explicit about which environment an action takes place in.**
+- Label every terminal block with 📍 LOCAL or 📍 VPS
+- Never mix local and VPS steps in the same instruction block
+- Complete all local steps first (code, commit, push), then do VPS steps in one go
+- Never context-switch between local and VPS mid-task without a clear section break
+- Standard end-of-session VPS deploy always comes last, after all local work is done
+
 ## What NOT to do
 - Never run `alembic init` or create files inside a container
 - Never commit `.env`
 - Never hardcode passwords or secrets
 - Never use `docker compose exec` to create project files
 - Never install packages globally — always use the venv
+- Never tell Laura to run `git add` or `git commit` on the VPS
+- Never suggest editing files directly on the VPS

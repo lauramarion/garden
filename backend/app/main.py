@@ -20,3 +20,7 @@ def health():
 @app.get("/")
 def root():
     return FileResponse("static/public.html")
+
+@app.get("/gardener")
+def gardener():
+    return FileResponse("static/gardener.html")
