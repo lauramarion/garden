@@ -157,6 +157,12 @@ docker compose exec backend alembic upgrade head  # only if migrations changed
 - Never context-switch between local and VPS mid-task without a clear section break
 - Standard end-of-session VPS deploy always comes last, after all local work is done
 
+## Frontend rules
+- ALL styles go in `main.css` — no inline styles, no `<style>` blocks in HTML files, ever
+- HTML files contain structure only
+- JS files contain behaviour only
+- One CSS file: `backend/static/css/main.css`
+
 ## What NOT to do
 - Never run `alembic init` or create files inside a container
 - Never commit `.env`
@@ -165,3 +171,4 @@ docker compose exec backend alembic upgrade head  # only if migrations changed
 - Never install packages globally — always use the venv
 - Never tell Laura to run `git add` or `git commit` on the VPS
 - Never suggest editing files directly on the VPS
+- Never write inline styles or `<style>` blocks in HTML files
