@@ -106,11 +106,11 @@ def seed_plants(session):
             INSERT INTO plants (
                 code, common_name, latin_name, zone_id, container,
                 status, status_notes, acquired_from, acquired_date,
-                grid_col, grid_row, grid_slot
+                grid_col, grid_row, grid_slot, is_active
             ) VALUES (
                 :code, :common_name, :latin_name, :zone_id, :container,
                 :status, :status_notes, :acquired_from, :acquired_date,
-                :grid_col, :grid_row, :grid_slot
+                :grid_col, :grid_row, :grid_slot, TRUE
             )
             ON CONFLICT (code) DO NOTHING
         """), p)
