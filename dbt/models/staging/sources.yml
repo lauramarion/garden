@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: garden
+    schema: public
+    tables:
+      - name: plants
+      - name: zones
+      - name: journal_entries
+      - name: tasks
+      - name: plant_status_history
