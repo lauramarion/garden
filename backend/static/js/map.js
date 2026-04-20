@@ -58,7 +58,7 @@ const ZONE_COLORS = {
   patio_shelf_1:      { fill: '#e8e8e4', stroke: '#c8c8c4' },
   patio_shelf_2:      { fill: '#e8e8e4', stroke: '#c8c8c4' },
   pond:               { fill: '#4fc3f7', stroke: '#0288d1' },
-  rain_barrel:        { fill: '#78909c', stroke: '#546e7a' },
+  rain_barrel:        { fill: '#0b384e', stroke: '#09212c' },
   compost:            { fill: '#8d6e63', stroke: '#6d4c41' },
   default:            { fill: '#a5d6a7', stroke: '#81c784' },
 };
