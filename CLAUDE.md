@@ -172,3 +172,21 @@ docker compose exec backend alembic upgrade head  # only if migrations changed
 - Never tell Laura to run `git add` or `git commit` on the VPS
 - Never suggest editing files directly on the VPS
 - Never write inline styles or `<style>` blocks in HTML files
+
+## Current state (as of April 2026)
+- DB: 10 core tables + 5 gamification tables, all migrated
+- 51 plants seeded with real data
+- Public map at `/` — isometric canvas, hover tooltips, plant stats
+- Gardener UI at `/gardener` — map + plant cards + quick-log form + journal
+- No auth yet (deferred to last)
+- Sprites are placeholders — sprite_path column exists but no images yet
+- plant_status_history exists but nothing writes to it yet
+- Schemas folder is empty — routers use raw dict (to be cleaned up)
+
+## Next steps in order
+1. ✅ Verify grid coordinate labels. Fixed 11 plants in null zone, added 2 slot offsets (quincunx), use letter-number coord system (A=r0, 1=c17).
+2. dbt setup — install dbt-postgres, initialise project, write staging models (stg_plants, stg_journal_entries, stg_tasks), write mart models (plant_hp, garden_vitality_score)
+3. Dagster setup — daily snapshot pipeline writing to plant_status_history, quest generation foundations
+4. GitHub Actions CI/CD — auto deploy to VPS on push to main
+5. Dashboard page — dashboard.html fed by dbt mart models
+6. Auth — login page + JWT (last, portfolio only)

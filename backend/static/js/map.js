@@ -7,9 +7,9 @@ const ORIGIN_X = 120, ORIGIN_Y = 200;
 // Bounding box of the rendered grid in base (unscaled) coordinates.
 // Kitchen tiles (c>=13, r>=5) are not rendered, so the rightmost point is now
 // max(c+r)=21 shared by c=12,r=9 and c=17,r=4  →  MAP_X2 = 718 (was 848).
-const MAP_X1 = ORIGIN_X;
+const MAP_X1 = ORIGIN_X - TW / 2;
 const MAP_X2 = ORIGIN_X + 21 * (TW / 2) + TW;          // 718
-const MAP_Y1 = ORIGIN_Y - 9 * (TH / 2) - TH / 2;       // 70
+const MAP_Y1 = ORIGIN_Y - 11 * (TH / 2);                // 57  (c=-1 shifts top edge up by one TH)
 const MAP_Y2 = ORIGIN_Y + 17 * (TH / 2) + TH / 2;      // 434
 
 // Viewport transform – updated by fitCanvas(), used by render() and hit detection
@@ -42,7 +42,8 @@ function toScreen(c, r) {
 // drawing uses JS values directly
 // CSS does not apply to canvas elements.
 const ZONE_COLORS = {
-  back:               { fill: '#a8d5a2', stroke: '#7db87a' },
+  ivy_fence:          { fill: '#2d5a27', stroke: '#1a3a16' },
+  back:               { fill: '#34772b', stroke: '#1a3a16' },
   left_border_front:  { fill: '#4caf50', stroke: '#388e3c' },
   left_border_back:   { fill: '#4caf50', stroke: '#388e3c' },
   left_path:          { fill: '#c8c8c0', stroke: '#a8a89e' },
@@ -63,6 +64,7 @@ const ZONE_COLORS = {
 };
 
 function zoneCodeAt(c, r) {
+  if (c === -1) return 'ivy_fence';
   if (c >= 13 && r >= 5) return null;   // kitchen — not part of the garden map
   if ((c === 12 || c === 13) && r <= 1) return 'stairs';
   if (c >= 15) return r <= 1 ? 'patio_shelf_1' : 'patio_covered';
@@ -100,7 +102,7 @@ function drawGridLabels() {
   // Number labels (1–18) along the r=0 edge (bottom-left diagonal).
   // Placed at the midpoint of each tile's outer edge using c+0.5.
   ctx.textAlign = 'right';
-  for (let c = 0; c <= 17; c++) {
+  for (let c = -1; c <= 17; c++) {
     const { x, y } = toScreen(c + 0.5, 0);
     ctx.fillText(String(18 - c), x * _rs + _dx - 12, y * _rs + _dy);
   }
@@ -108,7 +110,7 @@ function drawGridLabels() {
   // Letter labels (A–J) along the c=0 edge (top-left diagonal).
   // Placed at the midpoint of each tile's outer edge using r+0.5.
   for (let r = 0; r <= 9; r++) {
-    const { x, y } = toScreen(0, r + 0.5);
+    const { x, y } = toScreen(-1, r + 0.5);
     ctx.fillText(String.fromCharCode(65 + r), x * _rs + _dx - 12, y * _rs + _dy);
   }
 
@@ -185,7 +187,7 @@ function drawWall() {
   });
 }
 
-const SLOT_OFFSETS = [{dx:0,dy:0},{dx:-9,dy:-5},{dx:9,dy:-5}];
+const SLOT_OFFSETS = [{dx:0,dy:0},{dx:-9,dy:-5},{dx:9,dy:-5},{dx:-9,dy:5},{dx:9,dy:5}];
 
 function hpColor(hp) {
   return hp > 60 ? '#44dd44' : hp > 30 ? '#ddaa22' : '#dd2222';
@@ -242,7 +244,7 @@ function render(hoveredPlant) {
   ctx.save();
   ctx.translate(_dx, _dy);
   ctx.scale(_rs, _rs);
-  for (let c = 0; c <= 17; c++) {
+  for (let c = -1; c <= 17; c++) {
     for (let r = 0; r <= 9; r++) {
       const zone = zoneCodeAt(c, r);
       if (zone === null) continue;
