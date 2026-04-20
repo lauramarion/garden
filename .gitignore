@@ -10,6 +10,10 @@ venv/
 .env
 .env.*
 
+# dagster
+dagster/dagster_home/
+dagster/.dagster/
+
 # dbt
 dbt/target/
 dbt/logs/
