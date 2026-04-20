@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>garden_project — Dashboard</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+
+  <header id="topbar"></header>
+  <script src="/static/js/topbar.js"></script>
+
+  <div class="dash-layout">
+
+    <div class="dash-summary">
+      <div class="vitality-card">
+        <div class="vitality-label">Garden vitality</div>
+        <div class="vitality-score" id="vitality-score">—</div>
+        <div class="vitality-sub">/ 100</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-label">Plants</div>
+        </div>
+        <div class="stat-card stat-ok">
+          <div class="stat-value" id="stat-ok">—</div>
+          <div class="stat-label">Thriving</div>
+        </div>
+        <div class="stat-card stat-warning">
+          <div class="stat-value" id="stat-warning">—</div>
+          <div class="stat-label">Warning</div>
+        </div>
+        <div class="stat-card stat-lost">
+          <div class="stat-value" id="stat-lost">—</div>
+          <div class="stat-label">Lost</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-section-title">Plant health — worst first</div>
+
+    <div class="plant-list" id="plant-list">
+      <div class="empty-state">Loading...</div>
+    </div>
+
+  </div>
+
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

@@ -173,6 +173,10 @@ docker compose exec backend alembic upgrade head  # only if migrations changed
 - Never suggest editing files directly on the VPS
 - Never write inline styles or `<style>` blocks in HTML files
 
+## PROJECT_OVERVIEW.md
+`PROJECT_OVERVIEW.md` at the repo root is a plain-language explanation of every component for Laura's reference.
+**Keep it updated** whenever a new component is added, an existing one changes significantly, or a new next step is completed.
+
 ## Current state (as of April 2026)
 - DB: 10 core tables + 5 gamification tables, all migrated
 - 51 plants seeded with real data
@@ -187,6 +191,6 @@ docker compose exec backend alembic upgrade head  # only if migrations changed
 1. ✅ Verify grid coordinate labels. Fixed 11 plants in null zone, added 2 slot offsets (quincunx), use letter-number coord system (A=r0, 1=c17).
 2. ✅ dbt setup — staging views (stg_plants, stg_journal_entries, stg_tasks) + mart tables (plant_hp, garden_vitality_score) in dbt_staging/dbt_marts schemas. Run with: cd dbt && dbt run --profiles-dir .
 3. ✅ Dagster setup — daily pipeline: plant_status_snapshot → generate_tasks (2 rules: WARNING + no action in 14 days). Run with: cd dagster && dagster dev -w workspace.yaml
-4. GitHub Actions CI/CD — auto deploy to VPS on push to main
-5. Dashboard page — dashboard.html fed by dbt mart models
+4. ✅ GitHub Actions CI/CD — .github/workflows/deploy.yml, SSH deploy on push to main (appleboy/ssh-action, secrets: VPS_HOST, VPS_USER, VPS_SSH_KEY)
+5. ✅ Dashboard page — vitality score + stat cards + plant HP list (worst first). Shared topbar component via topbar.js. API: /api/dashboard/summary + /api/dashboard/plants querying dbt_marts schema.
 6. Auth — login page + JWT (last, portfolio only)

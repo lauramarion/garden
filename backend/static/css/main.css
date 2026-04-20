@@ -76,6 +76,15 @@ h1, h2, h3, .label {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  position: relative;
+}
+
+.topbar-nav {
+  display: flex;
+  gap: 1.5rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .topbar-title {
@@ -482,6 +491,191 @@ textarea.form-control {
   color: var(--text-muted);
 }
 
+/* ── Dashboard ────────────────────────────────────────────── */
+.topbar-nav-link {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+}
+
+.topbar-nav-link:hover  { color: var(--text); }
+.topbar-nav-link.active { color: var(--aqua-dk); border-bottom-color: var(--aqua); }
+
+.dash-layout {
+  padding: 1.5rem;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.dash-summary {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-bottom: 2rem;
+}
+
+.vitality-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+}
+
+.vitality-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.vitality-score {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.vitality-sub {
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.stat-card {
+  background: var(--bg-mint);
+  border-radius: var(--r-md);
+  padding: 0.75rem 1rem;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--void);
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.stat-ok      .stat-value { color: var(--green); }
+.stat-warning .stat-value { color: var(--yellow); }
+.stat-lost    .stat-value { color: var(--pink); }
+
+.dash-section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.plant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.plant-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.plant-row:last-child { border-bottom: none; }
+
+.plant-row-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.plant-row-code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.plant-row-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plant-row-zone {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.plant-row-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.plant-row-hp-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.plant-row-hp-track { width: 80px; margin-bottom: 0 !important; }
+
+.plant-row-hp-val {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  min-width: 20px;
+  text-align: right;
+}
+
+/* ── Sprites ──────────────────────────────────────────────── */
 .plant-sprite-img       { image-rendering: pixelated; }
 .plant-sprite-placeholder {
   width: 64px; height: 64px;
