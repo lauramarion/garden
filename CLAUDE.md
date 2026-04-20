@@ -186,7 +186,7 @@ docker compose exec backend alembic upgrade head  # only if migrations changed
 ## Next steps in order
 1. ✅ Verify grid coordinate labels. Fixed 11 plants in null zone, added 2 slot offsets (quincunx), use letter-number coord system (A=r0, 1=c17).
 2. ✅ dbt setup — staging views (stg_plants, stg_journal_entries, stg_tasks) + mart tables (plant_hp, garden_vitality_score) in dbt_staging/dbt_marts schemas. Run with: cd dbt && dbt run --profiles-dir .
-3. Dagster setup — daily snapshot pipeline writing to plant_status_history, quest generation foundations
+3. ✅ Dagster setup — daily pipeline: plant_status_snapshot → generate_tasks (2 rules: WARNING + no action in 14 days). Run with: cd dagster && dagster dev -w workspace.yaml
 4. GitHub Actions CI/CD — auto deploy to VPS on push to main
 5. Dashboard page — dashboard.html fed by dbt mart models
 6. Auth — login page + JWT (last, portfolio only)

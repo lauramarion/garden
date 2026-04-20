@@ -13,6 +13,7 @@ venv/
 # dagster
 dagster/dagster_home/
 dagster/.dagster/
+dagster/.tmp_dagster_home_*/
 
 # dbt
 dbt/target/
