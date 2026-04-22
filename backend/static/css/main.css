@@ -64,7 +64,8 @@ body {
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.5;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -214,7 +215,7 @@ h1, h2, h3, .label {
   display: flex;
   flex: 1;
   overflow: hidden;
-  height: calc(100vh - 44px);
+  min-height: 0;
 }
 
 /* ── Map panel ────────────────────────────────────────────── */

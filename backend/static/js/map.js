@@ -226,9 +226,10 @@ function drawPlant(plant, highlight) {
     }
   }
 
-  // HP bar
+  // HP bar — above sprite top (py - 24*s) or above placeholder circle top (py - 6*s)
   const hp = plantHP(plant);
-  const bx = px - 10, by = py - 14 * s;
+  const bx = px - 10;
+  const by = plant.sprite_img ? py - 28 * s : py - 14 * s;
   ctx.fillStyle = '#111';
   ctx.fillRect(bx, by, 20, 3);
   ctx.fillStyle = hpColor(hp);
@@ -238,7 +239,7 @@ function drawPlant(plant, highlight) {
   if (plant.status === 'Struggling' || plant.status === 'Lost') {
     ctx.fillStyle = '#ffaa00';
     ctx.font = `${10 * s}px monospace`;
-    ctx.fillText('!', px + 8 * s, py - 8 * s);
+    ctx.fillText('!', px + 8 * s, by - 2);
   }
 }
 
@@ -258,7 +259,7 @@ function render(hoveredPlant) {
   drawWall();
   [...plants]
     .filter(p => zoneCodeAt(p.grid_col, p.grid_row) !== null)
-    .sort((a, b) => (a.grid_col + a.grid_row) - (b.grid_col + b.grid_row))
+    .sort((a, b) => (a.grid_col - a.grid_row) - (b.grid_col - b.grid_row))
     .forEach(p => drawPlant(p, hoveredPlant && hoveredPlant.id === p.id));
   ctx.restore();
   drawGridLabels();
@@ -269,7 +270,7 @@ function plantAtMouse(mx, my) {
   let best = null, bestD = 22;
   plants.forEach(p => {
     const { x, y } = toScreen(p.grid_col, p.grid_row);
-    const { dx, dy } = GRID_SLOTS[p.grid_slot || 0] || GRID_SLOTS[0];
+    const { dx, dy } = GRID_SLOTS[p.grid_slot || 1] || GRID_SLOTS[1];
     const d = Math.hypot(mx - (x + TW / 2 + dx), my - (y + dy - 6));
     if (d < bestD) { bestD = d; best = p; }
   });
@@ -342,15 +343,26 @@ let plants = [];
 let allZones = [];
 let allPlants = [];
 
+window.addEventListener('resize', () => { fitCanvas(); render(hoveredPlant); });
+
 async function loadAll() {
+  // Defer fitCanvas until after the browser has computed layout (avoids zero-height canvas)
+  await new Promise(r => requestAnimationFrame(r));
   fitCanvas();
-  window.addEventListener('resize', () => { fitCanvas(); render(hoveredPlant); });
 
   [allPlants, allZones] = await Promise.all([
     fetch('/api/plants/').then(r => r.json()),
     fetch('/api/zones/').then(r => r.json()),
   ]);
   plants = allPlants;
+
+  // Preload sprites — use sprite_path if set, otherwise try /static/sprites/{code}.svg
+  await Promise.all(allPlants.map(p => new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => { p.sprite_img = img; resolve(); };
+    img.onerror = resolve;
+    img.src = p.sprite_path || `/static/sprites/${p.code}.svg`;
+  })));
 
   // Populate public stats if the elements exist on this page
   const el = id => document.getElementById(id);
@@ -360,5 +372,4 @@ async function loadAll() {
 
   render(null);
 }
-
-loadAll();
+// loadAll() is called by each page's own script (public.js, gardener.js)

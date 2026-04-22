@@ -15,7 +15,7 @@ function plantCard(p) {
   const hp   = hpFor(p);
   const coord = tileCoord(p.grid_col, p.grid_row);
   const sprite = p.sprite_path
-    ? `<img src="/static/${p.sprite_path}" width="36" height="36" class="plant-card-sprite">`
+    ? `<img src="${p.sprite_path}" width="36" height="36" class="plant-card-sprite">`
     : `<div class="plant-card-sprite-placeholder"></div>`;
 
   return `

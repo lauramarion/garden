@@ -65,7 +65,7 @@ async function init() {
   const hp     = hpFor(plant);
   const coord  = tileCoord(plant.grid_col, plant.grid_row);
   const sprite = plant.sprite_path
-    ? `<img src="/static/${plant.sprite_path}" width="64" height="64" class="plant-sprite-img">`
+    ? `<img src="${plant.sprite_path}" width="64" height="64" class="plant-sprite-img">`
     : `<div class="plant-sprite-placeholder detail-sprite-placeholder">no sprite</div>`;
 
   const pendingTasks = tasks.filter(t => t.status !== 'done');

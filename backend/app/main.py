@@ -44,5 +44,5 @@ def plants_page():
     return FileResponse("static/plants.html")
 
 @app.get("/plants/{plant_id}")
-def plant_detail_page(_plant_id: int):
+def plant_detail_page(plant_id: int):
     return FileResponse("static/plant_detail.html")

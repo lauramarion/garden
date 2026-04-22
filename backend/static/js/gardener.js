@@ -68,7 +68,7 @@ function showPlantDetail(plant) {
   const hp   = plantHP(plant);
   const zone = allZones.find(z => z.id === plant.zone_id);
   const spriteHtml = plant.sprite_path
-    ? `<img src="/static/${plant.sprite_path}" width="64" height="64" class="plant-sprite-img">`
+    ? `<img src="${plant.sprite_path}" width="64" height="64" class="plant-sprite-img">`
     : `<div class="plant-sprite-placeholder">no sprite</div>`;
 
   document.getElementById('plant-detail').innerHTML = `
