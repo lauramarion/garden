@@ -389,4 +389,64 @@ Add these to `:root` in the global stylesheet:
 
 ---
 
+## 13 — Grid slot mapping
+
+Each map tile has 5 slots with fixed spatial meaning, oriented relative to the garden (back = fence, front = house/patio).
+
+```python
+SLOTS = {
+    1: 'centre',
+    2: 'back',    # towards back fence
+    3: 'front',   # towards house / patio
+    4: 'left',    # towards left border
+    5: 'right',   # towards right border
+}
+```
+
+### Slot picker UI layout
+
+```
+         [ back  ]
+[ left ] [centre ] [ right ]
+         [ front ]
+```
+
+A 3×3 cross/diamond of buttons. Selected slot gets aqua fill. Oriented the same way as the garden map — back at top, front at bottom.
+
+This mapping must be defined once in the backend as a constant and used consistently by the map renderer, the slot picker, and any future features. Never hardcode slot numbers directly in templates.
+
+### Notes
+- All existing `grid_slot` values in the DB were assigned arbitrarily — a full repositioning pass is needed once the slot picker UI exists.
+- No plants currently span multiple tiles. Multi-tile support is not planned for MVP.
+
+---
+
+## 14 — Icon set
+
+15 bespoke 24×24px pixel SVG icons, drawn in PixelForge with the Garden Project palette preset.
+
+| File | Usage |
+|---|---|
+| `plant.svg` | Ward / plant entry |
+| `sprout.svg` | New / just planted |
+| `sun.svg` | Light level / sun exposure |
+| `skull.svg` | Vitality: lost / dead |
+| `task.svg` | Duty / task |
+| `bloom.svg` | Flowering |
+| `calendar.svg` | Season / calendar |
+| `dormant.svg` | Dormant / seasonal sleep |
+| `undefined.svg` | Placeholder — new icon needed |
+| `zone.svg` | Territory / zone marker |
+| `add.svg` | Add new / create |
+| `alert.svg` | Disturbance / warning |
+| `map.svg` | Map view |
+| `water.svg` | Watering / moisture |
+| `done.svg` | Completed task / done |
+
+No `thriving` icon — the vitality badge dot handles that state visually.
+
+Always use `image-rendering: pixelated` on all icons. Canonical display sizes: 16px, 24px (native), 32px, 48px.
+
+---
+
 *Last updated: April 2026 — garden_project v1 design system*

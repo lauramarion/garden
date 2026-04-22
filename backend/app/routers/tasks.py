@@ -9,10 +9,14 @@ from ..models import Task
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 
 @router.get("/")
-def get_tasks(status: str = None, db: Session = Depends(get_db)):
-    query = select(Task).order_by(Task.created_at.desc())
+def get_tasks(status: str = None, plant_id: int = None, zone_id: int = None, db: Session = Depends(get_db)):
+    query = select(Task).order_by(Task.due_date.asc().nullslast(), Task.created_at.desc())
     if status:
         query = query.where(Task.status == status)
+    if plant_id:
+        query = query.where(Task.plant_id == plant_id)
+    if zone_id:
+        query = query.where(Task.zone_id == zone_id)
     tasks = db.execute(query).scalars().all()
     return [task_to_dict(t) for t in tasks]
 

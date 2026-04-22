@@ -23,17 +23,25 @@
     <!-- Side panel -->
     <aside class="side-panel">
       <div class="side-tabs">
-        <button class="side-tab active" data-tab="plant">Plant</button>
+        <button class="side-tab active" data-tab="plants">Plants</button>
+        <button class="side-tab" data-tab="zones">Zones</button>
         <button class="side-tab" data-tab="log">Log</button>
-        <button class="side-tab" data-tab="journal">Journal</button>
       </div>
 
-      <!-- Plant tab -->
-      <div class="side-content" id="tab-plant">
-        <div class="empty-state" id="plant-empty">
-          Click a plant on the map to inspect it.
+      <!-- Plants tab -->
+      <div class="side-content" id="tab-plants">
+        <div class="side-plant-list" id="side-plant-list">
+          <div class="empty-state">Loading...</div>
         </div>
-        <div id="plant-detail" style="display:none"></div>
+        <div class="side-plant-detail" id="side-plant-detail" style="display:none">
+          <button class="btn-back" id="side-back">← All plants</button>
+          <div id="plant-detail"></div>
+        </div>
+      </div>
+
+      <!-- Zones tab -->
+      <div class="side-content" id="tab-zones" style="display:none">
+        <div id="zones-list"></div>
       </div>
 
       <!-- Log tab -->
@@ -74,13 +82,6 @@
         </form>
       </div>
 
-      <!-- Journal tab -->
-      <div class="side-content" id="tab-journal" style="display:none">
-        <div id="journal-feed">
-          <div class="empty-state">Loading journal...</div>
-        </div>
-      </div>
-
     </aside>
   </div>
 
@@ -89,6 +90,5 @@
   <script src="/static/js/map.js"></script>
   <script src="/static/js/gardener.js"></script>
 
-</div>
 </body>
 </html>

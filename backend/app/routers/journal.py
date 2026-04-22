@@ -9,12 +9,21 @@ from ..models import JournalEntry
 router = APIRouter(prefix="/api/journal", tags=["journal"])
 
 @router.get("/")
-def get_entries(limit: int = 50, db: Session = Depends(get_db)):
-    entries = db.execute(
-        select(JournalEntry)
-        .order_by(JournalEntry.entry_date.desc(), JournalEntry.created_at.desc())
-        .limit(limit)
-    ).scalars().all()
+def get_entries(
+    limit: int = 50,
+    plant_id: int = None,
+    zone_id: int = None,
+    entry_type: str = None,
+    db: Session = Depends(get_db),
+):
+    query = select(JournalEntry).order_by(JournalEntry.entry_date.desc(), JournalEntry.created_at.desc())
+    if plant_id:
+        query = query.where(JournalEntry.plant_id == plant_id)
+    if zone_id:
+        query = query.where(JournalEntry.zone_id == zone_id)
+    if entry_type:
+        query = query.where(JournalEntry.entry_type == entry_type)
+    entries = db.execute(query.limit(limit)).scalars().all()
     return [entry_to_dict(e) for e in entries]
 
 @router.post("/")

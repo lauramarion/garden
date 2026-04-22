@@ -1,46 +1,71 @@
 // ── Gardener extensions ────────────────────────────────────
-// Override loadAll to also fetch journal and populate side panel
 const _baseLoad = loadAll;
 loadAll = async function() {
   await _baseLoad();
   allJournal = await fetch('/api/journal/?limit=100').then(r => r.json());
   populateLogSelects();
-  renderJournal();
+  renderSidePlantList();
+  renderZonesList();
 };
 
-// Override click handler
-onPlantClick = selectPlant;
+onPlantClick = function(plant) {
+  showPlantDetail(plant);
+  // Switch to Plants tab if not already there
+  activateTab('plants');
+};
 
 // ── State ──────────────────────────────────────────────────
 let allJournal = [];
 
-// ── Side panel ─────────────────────────────────────────────
-function populateLogSelects() {
-  const plantSel = document.getElementById('log-plant');
-  const zoneSel  = document.getElementById('log-zone');
-  allPlants.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.id;
-    opt.textContent = `${p.code} — ${p.common_name}`;
-    plantSel.appendChild(opt);
-  });
-  allZones.forEach(z => {
-    const opt = document.createElement('option');
-    opt.value = z.id;
-    opt.textContent = z.label;
-    zoneSel.appendChild(opt);
+// ── Tabs ───────────────────────────────────────────────────
+function activateTab(name) {
+  document.querySelectorAll('.side-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.side-content').forEach(c => c.style.display = 'none');
+  document.querySelector(`[data-tab="${name}"]`).classList.add('active');
+  document.getElementById(`tab-${name}`).style.display = 'block';
+}
+
+document.querySelectorAll('.side-tab').forEach(tab => {
+  tab.addEventListener('click', () => activateTab(tab.dataset.tab));
+});
+
+// ── Plants tab ─────────────────────────────────────────────
+function renderSidePlantList() {
+  const list = document.getElementById('side-plant-list');
+  if (!allPlants.length) {
+    list.innerHTML = '<div class="empty-state">No plants.</div>';
+    return;
+  }
+  list.innerHTML = allPlants.map(p => {
+    const hp = plantHP(p);
+    return `
+      <div class="side-plant-row" data-id="${p.id}">
+        <div class="side-plant-row-left">
+          <span class="plant-code">${p.code}</span>
+          <span class="side-plant-name">${p.common_name}</span>
+        </div>
+        <span class="status-badge status-${p.status}">${p.status}</span>
+      </div>`;
+  }).join('');
+
+  list.querySelectorAll('.side-plant-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const plant = allPlants.find(p => p.id === +row.dataset.id);
+      if (plant) {
+        showPlantDetail(plant);
+        // Highlight on map
+        hoveredPlant = plant;
+        render(plant);
+      }
+    });
   });
 }
 
-function selectPlant(plant) {
-  document.querySelectorAll('.side-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.side-content').forEach(c => c.style.display = 'none');
-  document.querySelector('[data-tab="plant"]').classList.add('active');
-  document.getElementById('tab-plant').style.display = 'block';
-  document.getElementById('plant-empty').style.display = 'none';
-  document.getElementById('plant-detail').style.display = 'block';
+function showPlantDetail(plant) {
+  document.getElementById('side-plant-list').style.display = 'none';
+  document.getElementById('side-plant-detail').style.display = 'block';
 
-  const hp = plantHP(plant);
+  const hp   = plantHP(plant);
   const zone = allZones.find(z => z.id === plant.zone_id);
   const spriteHtml = plant.sprite_path
     ? `<img src="/static/${plant.sprite_path}" width="64" height="64" class="plant-sprite-img">`
@@ -68,44 +93,54 @@ function selectPlant(plant) {
         <div class="plant-meta-item">From <span>${plant.acquired_from || '—'}</span></div>
       </div>
       ${plant.status_notes ? `<div class="plant-notes">${plant.status_notes}</div>` : ''}
+      <a href="/plants/${plant.id}" class="btn-back side-detail-link">Full detail →</a>
     </div>
   `;
 }
 
-function renderJournal() {
-  const feed = document.getElementById('journal-feed');
-  if (!allJournal.length) {
-    feed.innerHTML = '<div class="empty-state">No journal entries yet.</div>';
-    return;
-  }
-  feed.innerHTML = allJournal.map(e => {
-    const plant = allPlants.find(p => p.id === e.plant_id);
-    const zone  = allZones.find(z => z.id === e.zone_id);
-    const target = plant ? plant.code : zone ? zone.label : '';
-    return `
-      <div class="journal-entry">
-        <div class="journal-meta">
-          <span class="journal-date">${e.entry_date}</span>
-          <span class="journal-type">${e.entry_type}</span>
-          ${target ? `<span class="journal-target">${target}</span>` : ''}
-        </div>
-        <div class="journal-details">${e.details}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-// ── Tabs ───────────────────────────────────────────────────
-document.querySelectorAll('.side-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.side-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.side-content').forEach(c => c.style.display = 'none');
-    tab.classList.add('active');
-    document.getElementById(`tab-${tab.dataset.tab}`).style.display = 'block';
-  });
+document.getElementById('side-back').addEventListener('click', () => {
+  document.getElementById('side-plant-list').style.display = 'block';
+  document.getElementById('side-plant-detail').style.display = 'none';
+  hoveredPlant = null;
+  render(null);
 });
 
+// ── Zones tab ──────────────────────────────────────────────
+function renderZonesList() {
+  const el = document.getElementById('zones-list');
+  if (!allZones.length) {
+    el.innerHTML = '<div class="empty-state">No zones.</div>';
+    return;
+  }
+  el.innerHTML = allZones.map(z => `
+    <div class="zone-row">
+      <div class="zone-row-label">${z.label}</div>
+      <div class="zone-row-meta">
+        ${z.light    ? `<span class="task-tag">${z.light}</span>` : ''}
+        ${z.moisture ? `<span class="task-tag">${z.moisture}</span>` : ''}
+        ${z.covered  ? `<span class="task-tag">covered</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
 // ── Log form ───────────────────────────────────────────────
+function populateLogSelects() {
+  const plantSel = document.getElementById('log-plant');
+  const zoneSel  = document.getElementById('log-zone');
+  allPlants.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.code} — ${p.common_name}`;
+    plantSel.appendChild(opt);
+  });
+  allZones.forEach(z => {
+    const opt = document.createElement('option');
+    opt.value = z.id;
+    opt.textContent = z.label;
+    zoneSel.appendChild(opt);
+  });
+}
+
 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
 
 document.getElementById('log-form').addEventListener('submit', async e => {
@@ -133,9 +168,7 @@ document.getElementById('log-form').addEventListener('submit', async e => {
     fb.style.display = 'block';
     setTimeout(() => fb.style.display = 'none', 3000);
     allJournal = await fetch('/api/journal/?limit=100').then(r => r.json());
-    renderJournal();
   }
 });
 
-// Kick off the extended load
 loadAll();

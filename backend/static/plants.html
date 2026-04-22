@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>garden_project — Plants</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+
+  <header id="topbar"></header>
+  <script src="/static/js/topbar.js"></script>
+
+  <main class="page">
+    <div class="plants-layout">
+
+      <div class="plants-header">
+        <div class="plants-header-left">
+          <h1 class="page-title">Plants</h1>
+          <span class="count-badge" id="plants-count">—</span>
+        </div>
+        <div class="plants-header-right">
+          <input class="form-control search-input" id="plant-search" placeholder="Search...">
+          <button class="btn btn-primary" id="open-add-plant">+ Add plant</button>
+        </div>
+      </div>
+
+      <div class="plants-filters">
+        <select class="form-control filter-control" id="filter-status">
+          <option value="">All vitality</option>
+          <option value="Thriving">Thriving</option>
+          <option value="Stable">Stable</option>
+          <option value="New">New</option>
+          <option value="Dormant">Dormant</option>
+          <option value="Struggling">Struggling</option>
+          <option value="Lost">Lost</option>
+        </select>
+        <select class="form-control filter-control" id="filter-zone">
+          <option value="">All zones</option>
+        </select>
+        <select class="form-control filter-control" id="filter-sort">
+          <option value="name">Name A–Z</option>
+          <option value="hp-asc">HP worst first</option>
+          <option value="hp-desc">HP best first</option>
+          <option value="zone">Zone</option>
+        </select>
+      </div>
+
+      <div class="plants-grid" id="plants-grid"></div>
+
+    </div>
+  </main>
+
+  <!-- Add plant modal -->
+  <div class="modal-overlay" id="add-plant-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Add plant</span>
+        <button class="modal-close" id="close-add-plant">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-step" id="step-1">
+          <div class="modal-step-label">Step 1 — Basic info</div>
+          <div class="form-group">
+            <label class="form-label">Code <span class="form-required">*</span></label>
+            <input class="form-control" id="ap-code" placeholder="e.g. P52">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Common name <span class="form-required">*</span></label>
+            <input class="form-control" id="ap-name" placeholder="e.g. Lavande">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Latin name</label>
+            <input class="form-control" id="ap-latin" placeholder="e.g. Lavandula angustifolia">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Container</label>
+              <input class="form-control" id="ap-container" placeholder="e.g. pot terracotta">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acquired date</label>
+              <input type="date" class="form-control" id="ap-date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Acquired from</label>
+            <input class="form-control" id="ap-from" placeholder="e.g. Jardiland">
+          </div>
+        </div>
+
+        <div class="modal-step" id="step-2" style="display:none">
+          <div class="modal-step-label">Step 2 — Location</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Zone</label>
+              <select class="form-control" id="ap-zone">
+                <option value="">— None —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tile coord (e.g. E4)</label>
+              <input class="form-control" id="ap-coord" placeholder="A1 – J18">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Slot (1–5)</label>
+              <select class="form-control" id="ap-slot">
+                <option value="1">1 — Centre</option>
+                <option value="2">2 — Back</option>
+                <option value="3">3 — Front</option>
+                <option value="4">4 — Left</option>
+                <option value="5">5 — Right</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-step" id="step-3" style="display:none">
+          <div class="modal-step-label">Step 3 — Vitality</div>
+          <div class="vitality-picker" id="vitality-picker">
+            <label class="vitality-option"><input type="radio" name="ap-status" value="Thriving" checked><span class="status-badge status-Thriving">Thriving</span></label>
+            <label class="vitality-option"><input type="radio" name="ap-status" value="Stable"><span class="status-badge status-Stable">Stable</span></label>
+            <label class="vitality-option"><input type="radio" name="ap-status" value="New"><span class="status-badge status-New">New</span></label>
+            <label class="vitality-option"><input type="radio" name="ap-status" value="Dormant"><span class="status-badge status-Dormant">Dormant</span></label>
+            <label class="vitality-option"><input type="radio" name="ap-status" value="Struggling"><span class="status-badge status-Struggling">Struggling</span></label>
+            <label class="vitality-option"><input type="radio" name="ap-status" value="Lost"><span class="status-badge status-Lost">Lost</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="ap-back" style="display:none">← Back</button>
+        <button class="btn btn-primary" id="ap-next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/plants.js"></script>
+</body>
+</html>

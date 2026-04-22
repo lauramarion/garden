@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>garden_project — Journal</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+
+  <header id="topbar"></header>
+  <script src="/static/js/topbar.js"></script>
+
+  <main class="page">
+    <div class="journal-layout">
+
+      <div class="journal-header">
+        <h1 class="page-title">Journal</h1>
+        <button class="btn btn-primary" id="add-entry-toggle">+ New entry</button>
+      </div>
+
+      <div class="add-entry-form" id="add-entry-form" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="entry-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-control" id="entry-type">
+              <option value="action">Action</option>
+              <option value="observation">Observation</option>
+              <option value="purchase">Purchase</option>
+              <option value="decision">Decision</option>
+              <option value="event">Event</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plant (optional)</label>
+            <select class="form-control" id="entry-plant">
+              <option value="">— None —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zone (optional)</label>
+            <select class="form-control" id="entry-zone">
+              <option value="">— None —</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group form-group-grow">
+            <label class="form-label">Details</label>
+            <textarea class="form-control" id="entry-details" placeholder="What did you do or observe?"></textarea>
+          </div>
+          <div class="form-group form-group-actions">
+            <button class="btn btn-primary" id="entry-submit">Save</button>
+            <button class="btn btn-ghost" id="entry-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="journal-filters">
+        <select class="form-control filter-control" id="filter-plant">
+          <option value="">All plants</option>
+        </select>
+        <select class="form-control filter-control" id="filter-type">
+          <option value="">All types</option>
+          <option value="action">Action</option>
+          <option value="observation">Observation</option>
+          <option value="purchase">Purchase</option>
+          <option value="decision">Decision</option>
+          <option value="event">Event</option>
+        </select>
+      </div>
+
+      <div id="journal-feed"></div>
+
+    </div>
+  </main>
+
+  <script src="/static/js/journal.js"></script>
+</body>
+</html>

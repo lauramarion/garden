@@ -12,6 +12,7 @@
   <header id="topbar"></header>
   <script src="/static/js/topbar.js"></script>
 
+  <main class="page">
   <div class="dash-layout">
 
     <div class="dash-summary">
@@ -31,7 +32,7 @@
         </div>
         <div class="stat-card stat-warning">
           <div class="stat-value" id="stat-warning">—</div>
-          <div class="stat-label">Warning</div>
+          <div class="stat-label">Struggling</div>
         </div>
         <div class="stat-card stat-lost">
           <div class="stat-value" id="stat-lost">—</div>
@@ -40,13 +41,29 @@
       </div>
     </div>
 
-    <div class="dash-section-title">Plant health — worst first</div>
+    <div class="dash-xp-bar" id="dash-xp-bar" style="display:none">
+      <div class="dash-xp-info">
+        <span class="dash-xp-title" id="xp-title">Lv.1 Seedling</span>
+        <span class="dash-xp-val" id="xp-val">0 XP</span>
+      </div>
+      <div class="hp-bar-track dash-xp-track">
+        <div class="hp-bar-fill dash-xp-fill" id="xp-fill" style="width:0%;background:var(--aqua)"></div>
+      </div>
+    </div>
 
+    <div class="dash-section-title" id="disturbances-title" style="display:none">Needs attention</div>
+    <div class="plant-list" id="disturbances-list"></div>
+
+    <div class="dash-section-title">Plant health — worst first</div>
     <div class="plant-list" id="plant-list">
       <div class="empty-state">Loading...</div>
     </div>
 
+    <div class="dash-section-title">Recent journal</div>
+    <div id="dash-journal" class="dash-journal"></div>
+
   </div>
+  </main>
 
   <script src="/static/js/dashboard.js"></script>
 </body>

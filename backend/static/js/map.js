@@ -187,7 +187,8 @@ function drawWall() {
   });
 }
 
-const SLOT_OFFSETS = [{dx:0,dy:0},{dx:-9,dy:-5},{dx:9,dy:-5},{dx:-9,dy:5},{dx:9,dy:5}];
+// Slot 1=centre, 2=back, 3=front, 4=left, 5=right (1-indexed)
+const GRID_SLOTS = { 1:{dx:0,dy:0}, 2:{dx:-9,dy:-5}, 3:{dx:9,dy:5}, 4:{dx:-9,dy:5}, 5:{dx:9,dy:-5} };
 
 function hpColor(hp) {
   return hp > 60 ? '#44dd44' : hp > 30 ? '#ddaa22' : '#dd2222';
@@ -195,12 +196,13 @@ function hpColor(hp) {
 
 function plantHP(plant) {
   if (plant._hp !== undefined) return plant._hp;
-  return plant.status === 'OK' ? 80 : plant.status === 'WARNING' ? 35 : 5;
+  const HP_BY_STATUS = { Thriving: 80, Stable: 65, New: 60, Dormant: 50, Struggling: 35 };
+  return HP_BY_STATUS[plant.status] ?? 5;
 }
 
 function drawPlant(plant, highlight) {
   const { x, y } = toScreen(plant.grid_col, plant.grid_row);
-  const { dx, dy } = SLOT_OFFSETS[plant.grid_slot || 0] || SLOT_OFFSETS[0];
+  const { dx, dy } = GRID_SLOTS[plant.grid_slot || 1] || GRID_SLOTS[1];
   const px = x + TW / 2 + dx;
   const py = y + dy - 8;
   const s = highlight ? 1.25 : 1;
@@ -209,7 +211,8 @@ function drawPlant(plant, highlight) {
   if (plant.sprite_img) {
     ctx.drawImage(plant.sprite_img, px - 16 * s, py - 24 * s, 32 * s, 32 * s);
   } else {
-    const color = plant.status === 'OK' ? '#44aa44' : plant.status === 'WARNING' ? '#aa6622' : '#661111';
+    const STATUS_COLOR = { Thriving: '#44aa44', Stable: '#8877dd', New: '#22aaaa', Dormant: '#8877dd', Struggling: '#aa6622' };
+    const color = STATUS_COLOR[plant.status] ?? '#661111';
     ctx.fillStyle = '#585050';
     ctx.fillRect(px - 5 * s, py + 8 * s, 10 * s, 7 * s);
     ctx.fillStyle = color;
@@ -232,7 +235,7 @@ function drawPlant(plant, highlight) {
   ctx.fillRect(bx, by, 20 * hp / 100, 3);
 
   // Warning indicator
-  if (plant.status === 'WARNING') {
+  if (plant.status === 'Struggling' || plant.status === 'Lost') {
     ctx.fillStyle = '#ffaa00';
     ctx.font = `${10 * s}px monospace`;
     ctx.fillText('!', px + 8 * s, py - 8 * s);
@@ -266,7 +269,7 @@ function plantAtMouse(mx, my) {
   let best = null, bestD = 22;
   plants.forEach(p => {
     const { x, y } = toScreen(p.grid_col, p.grid_row);
-    const { dx, dy } = SLOT_OFFSETS[p.grid_slot || 0] || SLOT_OFFSETS[0];
+    const { dx, dy } = GRID_SLOTS[p.grid_slot || 0] || GRID_SLOTS[0];
     const d = Math.hypot(mx - (x + TW / 2 + dx), my - (y + dy - 6));
     if (d < bestD) { bestD = d; best = p; }
   });
@@ -352,8 +355,8 @@ async function loadAll() {
   // Populate public stats if the elements exist on this page
   const el = id => document.getElementById(id);
   if (el('stat-plants'))  el('stat-plants').textContent  = allPlants.length;
-  if (el('stat-ok'))      el('stat-ok').textContent      = allPlants.filter(p => p.status === 'OK').length;
-  if (el('stat-warning')) el('stat-warning').textContent = allPlants.filter(p => p.status === 'WARNING').length;
+  if (el('stat-ok'))      el('stat-ok').textContent      = allPlants.filter(p => p.status === 'Thriving').length;
+  if (el('stat-warning')) el('stat-warning').textContent = allPlants.filter(p => p.status === 'Struggling').length;
 
   render(null);
 }

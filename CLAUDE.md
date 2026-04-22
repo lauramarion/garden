@@ -193,4 +193,5 @@ docker compose exec backend alembic upgrade head  # only if migrations changed
 3. ✅ Dagster setup — daily pipeline: plant_status_snapshot → generate_tasks (2 rules: WARNING + no action in 14 days). Run with: cd dagster && dagster dev -w workspace.yaml
 4. ✅ GitHub Actions CI/CD — .github/workflows/deploy.yml, SSH deploy on push to main (appleboy/ssh-action, secrets: VPS_HOST, VPS_USER, VPS_SSH_KEY)
 5. ✅ Dashboard page — vitality score + stat cards + plant HP list (worst first). Shared topbar component via topbar.js. API: /api/dashboard/summary + /api/dashboard/plants querying dbt_marts schema.
-6. Auth — login page + JWT (last, portfolio only)
+6. ✅ Full UI — status vocabulary migrated (OK→Thriving, WARNING→Struggling), GRID_SLOTS 1-indexed, 5-item nav + season badge + mobile tab bar. Screens: Tasks (/tasks), Journal (/journal), Plants list (/plants), Plant detail (/plants/{id}), Add plant modal, Dashboard enhancements (XP bar + disturbances + recent journal), Map enhancements (Plants/Zones/Log tabs + side plant list).
+7. Auth — login page + JWT (last, portfolio only)

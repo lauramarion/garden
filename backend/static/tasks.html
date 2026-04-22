@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>garden_project — Tasks</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+
+  <header id="topbar"></header>
+  <script src="/static/js/topbar.js"></script>
+
+  <main class="page">
+    <div class="tasks-layout">
+
+      <div class="tasks-header">
+        <h1 class="page-title">Tasks</h1>
+        <button class="btn btn-primary" id="add-task-toggle">+ Add task</button>
+      </div>
+
+      <div class="add-task-form" id="add-task-form" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" id="task-title" placeholder="What needs doing?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due date</label>
+            <input type="date" class="form-control" id="task-due">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <select class="form-control" id="task-priority">
+              <option value="soon">Soon</option>
+              <option value="urgent">Urgent</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Plant (optional)</label>
+            <select class="form-control" id="task-plant">
+              <option value="">— None —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zone (optional)</label>
+            <select class="form-control" id="task-zone">
+              <option value="">— None —</option>
+            </select>
+          </div>
+          <div class="form-group form-group-actions">
+            <button class="btn btn-primary" id="task-submit">Add task</button>
+            <button class="btn btn-ghost" id="task-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="tasks-overdue" class="task-section task-section-overdue" style="display:none">
+        <div class="task-section-title">Overdue</div>
+        <div class="task-list" id="list-overdue"></div>
+      </div>
+
+      <div id="tasks-week" class="task-section task-section-week" style="display:none">
+        <div class="task-section-title">This week</div>
+        <div class="task-list" id="list-week"></div>
+      </div>
+
+      <div id="tasks-upcoming" class="task-section task-section-upcoming" style="display:none">
+        <div class="task-section-title">Upcoming</div>
+        <div class="task-list" id="list-upcoming"></div>
+      </div>
+
+      <div id="tasks-empty" class="empty-state">No pending tasks.</div>
+
+      <details class="tasks-archive" id="tasks-archive" style="display:none">
+        <summary class="task-section-title">Completed</summary>
+        <div class="task-list" id="list-done"></div>
+      </details>
+
+    </div>
+  </main>
+
+  <script src="/static/js/tasks.js"></script>
+</body>
+</html>
