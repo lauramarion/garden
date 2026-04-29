@@ -84,6 +84,39 @@
     </div>
   </main>
 
+  <!-- Done modal -->
+  <div class="modal-overlay" id="done-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Complete task</span>
+        <button class="modal-close" id="done-modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="done-choice">
+          <div class="done-task-name" id="done-task-name"></div>
+          <div class="done-choice-buttons">
+            <button class="btn btn-success" id="done-complete">Task complete</button>
+            <button class="btn btn-ghost" id="done-monitor">Monitor outcome →</button>
+          </div>
+        </div>
+        <div id="done-monitor-form" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Note — expected result or remedial action if not met</label>
+            <textarea class="form-control" id="monitor-note" placeholder="e.g. Should see new growth within 2 weeks. If not, repot."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Observation date</label>
+            <input type="date" class="form-control" id="monitor-date">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" id="done-modal-footer" style="display:none">
+        <button class="btn btn-ghost" id="monitor-back">← Back</button>
+        <button class="btn btn-primary" id="monitor-save">Save &amp; close task</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/static/js/tasks.js"></script>
 </body>
 </html>

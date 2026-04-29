@@ -108,8 +108,9 @@ ENVIRONMENT=development  # or production
 - Plant vitality states: `Thriving` (HP 80), `Stable` (65), `New` (60), `Dormant` (50), `Struggling` (35), `Lost` (5)
 - HP scores computed in dbt (`dbt_marts.plant_hp`) — never stored raw
 - Gamification: RPG style — XP, HP bars, levels (GardenerProfile table, not yet fully wired)
-- Sprites: 64×64 PNG, transparent bg, Stardew Valley aesthetic — `sprite_path` column exists
+- Sprites: SVG, stored as `/static/sprites/{code}.svg` — auto-detected by filename, no DB update needed. Upload via gardener side panel. `sprite_path` column exists but is optional (fallback uses code).
 - No emoji in UI — pixel art SVG icons only (`backend/static/icons/`)
+- Zone colors: defined as JS inline styles in `plants.js` (`ZONE_STYLE` map, keyed by `zone.code`) — exception to the no-inline-styles rule since colors are data-driven from the DB
 
 ## Frontend rules
 - ALL styles in `main.css` — no inline styles, no `<style>` blocks in HTML, ever
@@ -146,11 +147,26 @@ Plain-language explanation of every component for Laura's reference.
 - dbt computes plant HP and garden vitality score daily
 - Dagster runs daily pipeline: status snapshot + auto-generate tasks
 - GitHub Actions deploys to VPS on push to main
-- Sprites are placeholders — `sprite_path` column exists, no images yet
 - `plant_status_history` written by Dagster daily snapshot
 - Schemas folder empty — routers use raw dict (future cleanup)
 - No auth yet (deferred, last item)
 
+### Gardener page (`/gardener`)
+- Side panel: Plants tab with live search (by code/name/latin), Zones tab, Log tab
+- Plant card (side panel): sprite, HP bar, meta, pending tasks with Done button, action buttons (add/update sprite via upload, log action, log obs pre-fill Log tab, update location inline form)
+- Sprite upload: `POST /api/plants/{id}/sprite` → saves as `/static/sprites/{code}.svg`; requires `python-multipart` installed
+
+### Plants page (`/plants`)
+- Single-column list, card shows: line 1 (code + name + status badge), line 2 (tile coord · zone chip with map color · container)
+- Header: search bar flex-expands, Add plant button same height
+
+### Plant detail page (`/plants/{id}`)
+- Sprite displayed at ~25% content width (responsive, not fixed px)
+
+### Tasks page (`/tasks`)
+- Dismiss button: sets status `dismissed`, hidden from all lists
+- Done button: opens modal with two paths — "Task complete" (immediate) or "Monitor outcome" (note + observation date → creates follow-up task, then marks done)
+
 ## Next steps
-See `todo.md` for the current task list.
+See `TODO.md` for the current task list. All planned features now complete.
 Auth (login page + JWT) is last — deferred until all features complete.

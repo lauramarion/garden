@@ -911,7 +911,8 @@ textarea.form-control {
 }
 .btn-ghost:hover { border-color: var(--aqua); color: var(--text); }
 
-.search-input { max-width: 220px; }
+.search-input { flex: 1; min-width: 140px; }
+.plants-header-right .form-control { padding: 9px 12px; }
 
 .filter-control { max-width: 200px; }
 
@@ -1011,6 +1012,40 @@ textarea.form-control {
   white-space: nowrap;
 }
 .btn-done:hover { background: var(--aqua); color: #fff; }
+
+.task-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.btn-dismiss {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 4px 6px;
+  opacity: 0.6;
+}
+.btn-dismiss:hover { opacity: 1; color: var(--pink); }
+
+.done-task-name {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.done-choice-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
 
 .tasks-archive {
   margin-top: 1.5rem;
@@ -1130,12 +1165,64 @@ textarea.form-control {
 
 .plants-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
 }
 
-@media (max-width: 600px) {
-  .plants-grid { grid-template-columns: 1fr; }
+/* ── Plant card line layout ───────────────────────────────── */
+.plant-card-line1 {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.2rem;
+}
+
+.plant-card-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plant-card-line2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.375rem;
+}
+
+.line2-sep {
+  color: var(--text-muted);
+  font-size: 9px;
+  line-height: 1;
+}
+
+.plant-tag {
+  font-size: 9px;
+  font-family: var(--font-display);
+  border-radius: var(--r-sm);
+}
+
+.plant-tag-coord {
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.plant-tag-zone {
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  font-size: 9px;
+}
+
+.plant-tag-container {
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 10px;
 }
 
 .plant-card-link {
@@ -1227,11 +1314,13 @@ textarea.form-control {
   margin-bottom: 1.25rem;
 }
 
-.detail-sprite { flex-shrink: 0; }
+.detail-sprite { width: 25%; flex-shrink: 0; }
+
+.detail-sprite-img { width: 100%; height: auto; display: block; }
 
 .detail-sprite-placeholder {
-  width: 64px;
-  height: 64px;
+  width: 100%;
+  aspect-ratio: 1;
   font-size: 9px;
 }
 
@@ -1426,6 +1515,76 @@ textarea.form-control {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+/* ── Side panel search ────────────────────────────────────── */
+.side-search {
+  padding: 0.5rem 0.75rem 0.375rem;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.side-search-input {
+  width: 100%;
+  font-size: 11px;
+}
+
+/* ── Plant card tasks ─────────────────────────────────────── */
+.plant-card-tasks {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.plant-task-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4px 0;
+  border-top: 0.5px solid var(--border);
+}
+
+.plant-task-title {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Plant card action buttons ────────────────────────────── */
+.plant-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.btn-action {
+  background: transparent;
+  border: 1px solid var(--border-md);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  font-size: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-action:hover { border-color: var(--aqua); color: var(--text); }
+
+.location-form {
+  display: flex;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+.loc-input {
+  width: 52px;
+  padding: 4px 6px;
+  font-size: 11px;
 }
 
 .form-required { color: var(--pink); }

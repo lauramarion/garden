@@ -64,9 +64,10 @@ async function init() {
   const zone   = allZones.find(z => z.id === plant.zone_id);
   const hp     = hpFor(plant);
   const coord  = tileCoord(plant.grid_col, plant.grid_row);
-  const sprite = plant.sprite_path
-    ? `<img src="${plant.sprite_path}" width="64" height="64" class="plant-sprite-img">`
-    : `<div class="plant-sprite-placeholder detail-sprite-placeholder">no sprite</div>`;
+  const spriteSrc = plant.sprite_path || `/static/sprites/${plant.code}.svg`;
+  const sprite = `<img src="${spriteSrc}" class="plant-sprite-img detail-sprite-img"
+    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="plant-sprite-placeholder detail-sprite-placeholder" style="display:none">no sprite</div>`;
 
   const pendingTasks = tasks.filter(t => t.status !== 'done');
   const journalHtml  = journal.length

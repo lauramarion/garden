@@ -1,6 +1,27 @@
 let allPlants = [];
 let allZones  = [];
 
+const ZONE_STYLE = {
+  lawn:               'background:#7ec850;color:#1a3a16',
+  back:               'background:#34772b;color:#c8e8c0',
+  ivy_fence:          'background:#2d5a27;color:#c8e8c0',
+  left_border_front:  'background:#4caf50;color:#001a16',
+  left_border_back:   'background:#4caf50;color:#001a16',
+  left_path:          'background:#c8c8c0;color:#444',
+  right_border_front: 'background:#66bb6a;color:#001a16',
+  right_border_back:  'background:#81c784;color:#001a16',
+  entry:              'background:#b8b8b0;color:#333',
+  retaining_wall:     'background:#a8a8a0;color:#333',
+  stairs:             'background:#c8bfb0;color:#333',
+  patio_uncovered:    'background:#dcdcd8;color:#333',
+  patio_covered:      'background:#d0d0cc;color:#333',
+  patio_shelf_1:      'background:#e8e8e4;color:#333',
+  patio_shelf_2:      'background:#e8e8e4;color:#333',
+  pond:               'background:#4fc3f7;color:#001a16',
+  rain_barrel:        'background:#0b384e;color:#9dc8e0',
+  compost:            'background:#8d6e63;color:#fff',
+};
+
 const HP_BY_STATUS = { Thriving: 80, Stable: 65, New: 60, Dormant: 50, Struggling: 35 };
 function hpFor(p) { return HP_BY_STATUS[p.status] ?? 5; }
 function hpColor(hp) { return hp > 60 ? 'var(--green)' : hp > 30 ? 'var(--yellow)' : 'var(--pink)'; }
@@ -14,25 +35,28 @@ function plantCard(p) {
   const zone = allZones.find(z => z.id === p.zone_id);
   const hp   = hpFor(p);
   const coord = tileCoord(p.grid_col, p.grid_row);
-  const sprite = p.sprite_path
-    ? `<img src="${p.sprite_path}" width="36" height="36" class="plant-card-sprite">`
-    : `<div class="plant-card-sprite-placeholder"></div>`;
+  const spriteSrc = p.sprite_path || `/static/sprites/${p.code}.svg`;
+  const sprite = `<img src="${spriteSrc}" width="36" height="36" class="plant-card-sprite"
+    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="plant-card-sprite-placeholder" style="display:none"></div>`;
+
+  const line2 = [
+    coord       ? `<span class="plant-tag plant-tag-coord">${coord}</span>` : null,
+    zone        ? `<span class="plant-tag plant-tag-zone" style="${ZONE_STYLE[zone.code] || ''}">${zone.label}</span>` : null,
+    p.container ? `<span class="plant-tag plant-tag-container">${p.container}</span>` : null,
+  ].filter(Boolean).join('<span class="line2-sep">·</span>');
 
   return `
     <a href="/plants/${p.id}" class="plant-card-link">
       <div class="plant-card-grid">
         <div class="plant-card-sprite-wrap">${sprite}</div>
         <div class="plant-card-body">
-          <div class="plant-card-top">
+          <div class="plant-card-line1">
             <span class="plant-code">${p.code}</span>
+            <span class="plant-card-name">${p.common_name}</span>
             <span class="status-badge status-${p.status}">${p.status}</span>
           </div>
-          <div class="plant-name">${p.common_name}</div>
-          <div class="plant-tags">
-            ${zone  ? `<span class="task-tag">${zone.label}</span>` : ''}
-            ${p.container ? `<span class="task-tag">${p.container}</span>` : ''}
-            ${coord ? `<span class="task-tag">${coord}</span>` : ''}
-          </div>
+          ${line2 ? `<div class="plant-card-line2">${line2}</div>` : ''}
           <div class="hp-bar-track plant-card-hp-bar">
             <div class="hp-bar-fill" style="width:${hp}%;background:${hpColor(hp)}"></div>
           </div>

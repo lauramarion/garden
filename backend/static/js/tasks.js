@@ -39,12 +39,16 @@ function taskRow(t) {
         ${t.priority ? `<span class="task-priority task-priority-${t.priority}">${t.priority}</span>` : ''}
         ${dateStr ? `<span class="task-due">${dateStr}</span>` : ''}
       </div>
-      ${!done ? `<button class="btn btn-done" data-id="${t.id}">Done</button>` : ''}
+      ${!done ? `
+        <div class="task-row-actions">
+          <button class="btn-dismiss" data-id="${t.id}">Dismiss</button>
+          <button class="btn btn-done" data-id="${t.id}">Done</button>
+        </div>` : ''}
     </div>`;
 }
 
 function render() {
-  const pending = allTasks.filter(t => t.status !== 'done');
+  const pending = allTasks.filter(t => t.status !== 'done' && t.status !== 'dismissed');
   const done    = allTasks.filter(t => t.status === 'done');
 
   const overdue  = pending.filter(t => bucket(t) === 'overdue');
@@ -67,16 +71,97 @@ function render() {
   document.getElementById('list-done').innerHTML = done.map(taskRow).join('');
 
   document.querySelectorAll('.btn-done').forEach(btn => {
-    btn.addEventListener('click', () => markDone(+btn.dataset.id));
+    btn.addEventListener('click', () => showDoneModal(+btn.dataset.id));
+  });
+  document.querySelectorAll('.btn-dismiss').forEach(btn => {
+    btn.addEventListener('click', () => dismissTask(+btn.dataset.id));
   });
 }
 
-async function markDone(id) {
-  await fetch(`/api/tasks/${id}/complete`, { method: 'PATCH' });
+async function dismissTask(id) {
+  await fetch(`/api/tasks/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'dismissed' }),
+  });
   const t = allTasks.find(t => t.id === id);
-  if (t) { t.status = 'done'; t.completed_at = new Date().toISOString(); }
+  if (t) t.status = 'dismissed';
   render();
 }
+
+// ── Done modal ──────────────────────────────────────────────
+let activeDoneTaskId = null;
+
+function showDoneModal(id) {
+  activeDoneTaskId = id;
+  const t = allTasks.find(t => t.id === id);
+  document.getElementById('done-task-name').textContent = t ? t.title : '';
+  document.getElementById('done-choice').style.display = 'block';
+  document.getElementById('done-monitor-form').style.display = 'none';
+  document.getElementById('done-modal-footer').style.display = 'none';
+  document.getElementById('done-modal').style.display = 'flex';
+}
+
+document.getElementById('done-modal-close').addEventListener('click', () => {
+  document.getElementById('done-modal').style.display = 'none';
+});
+document.getElementById('done-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget)
+    document.getElementById('done-modal').style.display = 'none';
+});
+
+document.getElementById('done-complete').addEventListener('click', async () => {
+  if (activeDoneTaskId === null) return;
+  await fetch(`/api/tasks/${activeDoneTaskId}/complete`, { method: 'PATCH' });
+  const t = allTasks.find(t => t.id === activeDoneTaskId);
+  if (t) { t.status = 'done'; t.completed_at = new Date().toISOString(); }
+  document.getElementById('done-modal').style.display = 'none';
+  render();
+});
+
+document.getElementById('done-monitor').addEventListener('click', () => {
+  const week = new Date(); week.setDate(week.getDate() + 7);
+  document.getElementById('monitor-date').value = week.toISOString().split('T')[0];
+  document.getElementById('done-choice').style.display = 'none';
+  document.getElementById('done-monitor-form').style.display = 'block';
+  document.getElementById('done-modal-footer').style.display = 'flex';
+});
+
+document.getElementById('monitor-back').addEventListener('click', () => {
+  document.getElementById('done-choice').style.display = 'block';
+  document.getElementById('done-monitor-form').style.display = 'none';
+  document.getElementById('done-modal-footer').style.display = 'none';
+});
+
+document.getElementById('monitor-save').addEventListener('click', async () => {
+  if (activeDoneTaskId === null) return;
+  const original = allTasks.find(t => t.id === activeDoneTaskId);
+  const note    = document.getElementById('monitor-note').value.trim();
+  const obsDate = document.getElementById('monitor-date').value || null;
+
+  const res = await fetch('/api/tasks/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title:       original ? original.title : 'Follow-up',
+      description: note || null,
+      due_date:    obsDate,
+      priority:    'soon',
+      plant_id:    original ? original.plant_id : null,
+      zone_id:     original ? original.zone_id  : null,
+      status:      'pending',
+      source:      'manual',
+    }),
+  });
+  if (res.ok) allTasks.unshift(await res.json());
+
+  await fetch(`/api/tasks/${activeDoneTaskId}/complete`, { method: 'PATCH' });
+  if (original) { original.status = 'done'; original.completed_at = new Date().toISOString(); }
+
+  document.getElementById('monitor-note').value = '';
+  document.getElementById('done-modal').style.display = 'none';
+  render();
+});
 
 function populateSelects() {
   const ps = document.getElementById('task-plant');

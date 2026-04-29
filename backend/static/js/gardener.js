@@ -6,6 +6,7 @@ loadAll = async function() {
   populateLogSelects();
   renderSidePlantList();
   renderZonesList();
+  initPlantSearch();
 };
 
 onPlantClick = function(plant) {
@@ -30,13 +31,13 @@ document.querySelectorAll('.side-tab').forEach(tab => {
 });
 
 // ── Plants tab ─────────────────────────────────────────────
-function renderSidePlantList() {
+function renderSidePlantList(filtered = allPlants) {
   const list = document.getElementById('side-plant-list');
-  if (!allPlants.length) {
-    list.innerHTML = '<div class="empty-state">No plants.</div>';
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state">No plants found.</div>';
     return;
   }
-  list.innerHTML = allPlants.map(p => {
+  list.innerHTML = filtered.map(p => {
     const hp = plantHP(p);
     return `
       <div class="side-plant-row" data-id="${p.id}">
@@ -53,7 +54,6 @@ function renderSidePlantList() {
       const plant = allPlants.find(p => p.id === +row.dataset.id);
       if (plant) {
         showPlantDetail(plant);
-        // Highlight on map
         hoveredPlant = plant;
         render(plant);
       }
@@ -61,15 +61,46 @@ function renderSidePlantList() {
   });
 }
 
-function showPlantDetail(plant) {
+function initPlantSearch() {
+  const input = document.getElementById('plant-search');
+  if (!input) return;
+  input.addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { renderSidePlantList(); return; }
+    const filtered = allPlants.filter(p =>
+      p.code.toLowerCase().includes(q) ||
+      p.common_name.toLowerCase().includes(q) ||
+      (p.latin_name && p.latin_name.toLowerCase().includes(q))
+    );
+    renderSidePlantList(filtered);
+  });
+}
+
+async function showPlantDetail(plant) {
+  document.getElementById('side-search').style.display = 'none';
   document.getElementById('side-plant-list').style.display = 'none';
   document.getElementById('side-plant-detail').style.display = 'block';
 
-  const hp   = plantHP(plant);
-  const zone = allZones.find(z => z.id === plant.zone_id);
-  const spriteHtml = plant.sprite_path
-    ? `<img src="${plant.sprite_path}" width="64" height="64" class="plant-sprite-img">`
-    : `<div class="plant-sprite-placeholder">no sprite</div>`;
+  const [hp, zone, allTasks] = [
+    plantHP(plant),
+    allZones.find(z => z.id === plant.zone_id),
+    await fetch(`/api/tasks/?plant_id=${plant.id}`).then(r => r.json()),
+  ];
+  const pendingTasks = allTasks.filter(t => t.status !== 'done');
+
+  const spriteSrc = plant.sprite_path || `/static/sprites/${plant.code}.svg`;
+  const spriteHtml = `<img src="${spriteSrc}" width="64" height="64" class="plant-sprite-img"
+    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="plant-sprite-placeholder" style="display:none">no sprite</div>`;
+
+  const tasksHtml = pendingTasks.length
+    ? pendingTasks.map(t => `
+        <div class="plant-task-row" data-task-id="${t.id}">
+          <span class="plant-task-title">${t.title}</span>
+          ${t.due_date ? `<span class="task-due">${t.due_date}</span>` : ''}
+          <button class="btn-done plant-task-done" data-task-id="${t.id}">Done</button>
+        </div>`).join('')
+    : '';
 
   document.getElementById('plant-detail').innerHTML = `
     <div class="plant-card">
@@ -93,12 +124,97 @@ function showPlantDetail(plant) {
         <div class="plant-meta-item">From <span>${plant.acquired_from || '—'}</span></div>
       </div>
       ${plant.status_notes ? `<div class="plant-notes">${plant.status_notes}</div>` : ''}
+      ${tasksHtml ? `<div class="plant-card-tasks">${tasksHtml}</div>` : ''}
+      <div class="plant-card-actions">
+        <button class="btn-action" id="btn-sprite">${plant.sprite_path ? 'Update sprite' : 'Add sprite'}</button>
+        <button class="btn-action" id="btn-log-action">Log action</button>
+        <button class="btn-action" id="btn-log-obs">Log obs</button>
+        <button class="btn-action" id="btn-location">Location</button>
+      </div>
+      <div class="location-form" id="location-form" style="display:none">
+        <input type="number" class="form-control loc-input" id="loc-col" placeholder="Col" value="${plant.grid_col ?? ''}">
+        <input type="number" class="form-control loc-input" id="loc-row" placeholder="Row" value="${plant.grid_row ?? ''}">
+        <input type="number" class="form-control loc-input" id="loc-slot" placeholder="Slot" value="${plant.grid_slot ?? ''}">
+        <button class="btn-ghost" id="btn-save-location">Save</button>
+      </div>
+      <input type="file" id="sprite-input" accept=".svg" style="display:none">
       <a href="/plants/${plant.id}" class="btn-back side-detail-link">Full detail →</a>
     </div>
   `;
+
+  // Sprite upload
+  const spriteInput = document.getElementById('sprite-input');
+  document.getElementById('btn-sprite').addEventListener('click', () => spriteInput.click());
+  spriteInput.addEventListener('change', async () => {
+    const file = spriteInput.files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`/api/plants/${plant.id}/sprite`, { method: 'POST', body: form });
+    if (res.ok) {
+      const newSrc = `/static/sprites/${plant.code}.svg?t=${Date.now()}`;
+      const imgEl = document.querySelector('#plant-detail .plant-sprite-img');
+      if (imgEl) { imgEl.style.display = ''; imgEl.src = newSrc; }
+      plant.sprite_path = `/static/sprites/${plant.code}.svg`;
+      document.getElementById('btn-sprite').textContent = 'Update sprite';
+      const newImg = new Image();
+      newImg.onload = () => { plant.sprite_img = newImg; render(hoveredPlant); };
+      newImg.src = newSrc;
+    }
+  });
+
+  // Log shortcuts — pre-fill Log tab and switch to it
+  document.getElementById('btn-log-action').addEventListener('click', () => {
+    document.getElementById('log-plant').value = plant.id;
+    document.getElementById('log-type').value = 'action';
+    activateTab('log');
+  });
+  document.getElementById('btn-log-obs').addEventListener('click', () => {
+    document.getElementById('log-plant').value = plant.id;
+    document.getElementById('log-type').value = 'observation';
+    activateTab('log');
+  });
+
+  // Update location — toggle inline form
+  document.getElementById('btn-location').addEventListener('click', () => {
+    const form = document.getElementById('location-form');
+    form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+  });
+  document.getElementById('btn-save-location').addEventListener('click', async () => {
+    const col  = document.getElementById('loc-col').value;
+    const row  = document.getElementById('loc-row').value;
+    const slot = document.getElementById('loc-slot').value;
+    await fetch(`/api/plants/${plant.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grid_col:  col  !== '' ? +col  : null,
+        grid_row:  row  !== '' ? +row  : null,
+        grid_slot: slot !== '' ? +slot : null,
+      }),
+    });
+    plant.grid_col  = col  !== '' ? +col  : null;
+    plant.grid_row  = row  !== '' ? +row  : null;
+    plant.grid_slot = slot !== '' ? +slot : null;
+    document.getElementById('location-form').style.display = 'none';
+    render(hoveredPlant);
+  });
+
+  // Pending task Done buttons
+  document.querySelectorAll('.plant-task-done').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const taskId = +btn.dataset.taskId;
+      const res = await fetch(`/api/tasks/${taskId}/complete`, { method: 'PATCH' });
+      if (res.ok) {
+        const row = btn.closest('.plant-task-row');
+        row.remove();
+      }
+    });
+  });
 }
 
 document.getElementById('side-back').addEventListener('click', () => {
+  document.getElementById('side-search').style.display = 'block';
   document.getElementById('side-plant-list').style.display = 'block';
   document.getElementById('side-plant-detail').style.display = 'none';
   hoveredPlant = null;

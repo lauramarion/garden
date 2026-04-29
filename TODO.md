@@ -7,37 +7,35 @@ Items are worked on in order within each section. Add new items anywhere — the
 ## Bugs
 
 - [x] **Plant detail page broken** — was returning `{"detail":"Not Found"}` because the `/plants/{id}` route and `plant_detail.html` didn't exist yet. Both created this session.
+- [x] **Sprite not reflected on plant detail page** — applied same `{code}.svg` fallback as map.js to plant_detail.js, gardener.js, and plants.js; onerror swaps to placeholder if file doesn't exist
 
 ---
 
 ## Map (`/gardener`)
 
-- [ ] **Plant card action buttons** — when a plant is selected in the side panel, show action buttons: add/update sprite, log action, log observation, update location
-- [ ] **Pending tasks on plant card** — show any pending tasks linked to that plant, each with a Done button
-- [ ] **Plant search with autosuggest** — search bar in the Plants tab that searches by name, latin name, or code; suggestions appear as you type; clicking a result highlights the plant on the map and opens its card
+- [x] **Plant card action buttons** — add/update sprite (file upload → `{code}.svg`), log action, log obs (pre-fill Log tab), update location (inline col/row/slot form)
+- [x] **Pending tasks on plant card** — fetches tasks on card open, shows pending ones with Done button that calls complete endpoint and removes the row
+- [x] **Plant search with autosuggest** — search input filters the plant list live by code, name, or latin name; hides when viewing a card, restores on back
 
 ---
 
 ## Plants (`/plants`)
 
-- [ ] **Single-column layout** — switch from 2-column grid to 1-column list
-- [ ] **Card layout rework**:
-  - Line 1: plant code + common name (same line)
-  - Line 2: tile coordinate · zone (zone background colour) · container/pot — each with distinct formatting
-- [ ] **Header alignment** — Add plant button same height as search bar; search bar wider to use available space
+- [x] **Single-column layout** — switched to `grid-template-columns: 1fr`
+- [x] **Card layout rework** — line 1: code + name + badge; line 2: coord · zone (colored bg from ZONE_STYLE map) · container with `·` separators
+- [x] **Header alignment** — search bar `flex: 1`, button padding matched to input height
+- [x] **Larger sprite on plant detail page** — `.detail-sprite` is now `width: 25%`, img scales to fill
 
 ---
 
 ## Sprites
 
-- [ ] **Sprite upload flow** — when using the "add sprite" button, the file should be automatically named `{code}.svg` and stored in `/backend/static/sprites/`; it will load automatically with no DB update needed
+- [x] **Sprite upload flow** — file upload via gardener action button auto-names `{code}.svg` and stores in `/backend/static/sprites/`; no DB update needed
 - [x] **Verify existing sprite** — sprites load automatically by matching `{code}.svg` filename; z-ordering and HP bar position also fixed
 
 ---
 
 ## Tasks (`/tasks`)
 
-- [ ] **Dismiss button** — add a way to dismiss a task without marking it done
-- [ ] **Richer "mark done" flow** — when completing a task, user chooses between:
-  - *Task complete* (current behaviour)
-  - *Monitor outcome* — user adds a note (expected result, remedial action if not met, observation date); a follow-up task is automatically created with that note as description
+- [x] **Dismiss button** — Dismiss button sets status to `dismissed`; dismissed tasks hidden from all lists
+- [x] **Richer "mark done" flow** — Done opens a modal: "Task complete" completes immediately; "Monitor outcome" collects a note + observation date, creates a follow-up task with same plant/zone, then marks original done

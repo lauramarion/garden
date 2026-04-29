@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+import os
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from typing import Optional
@@ -31,6 +32,18 @@ def create_plant(data: dict, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(plant)
     return plant_to_dict(plant)
+
+@router.post("/{plant_id}/sprite")
+async def upload_sprite(plant_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    plant = db.get(Plant, plant_id)
+    if not plant:
+        raise HTTPException(status_code=404, detail="Plant not found")
+    dest = os.path.join("static", "sprites", f"{plant.code}.svg")
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    content = await file.read()
+    with open(dest, "wb") as f:
+        f.write(content)
+    return {"ok": True, "path": f"/static/sprites/{plant.code}.svg"}
 
 @router.patch("/{plant_id}")
 def update_plant(plant_id: int, data: dict, db: Session = Depends(get_db)):
